@@ -250,6 +250,8 @@ class MyGame(arcade.Window):
         self.frame_count += 1
         if self.frame_count % 10 == 0:
             self.drop() 
+        score_print = "Score: ", str(self.score)
+        print(score_print, sep=' ', end='', flush=True)
 
     def move(self, delta_x):
         """ Move the stone back and forth based on delta x. """
