@@ -5,9 +5,13 @@ import colorama
 from colorama import Fore, init
 init()#Needed for Windows to use the colorama codes for colors
 import numpy as np
+import winsound
 
-from Player import Player
+from Population import Population
+pop = Population(30)
 
+#from Player import Player
+#bot = Player([244, 36, 4])
 ###########################################################
 
 # So the code outputs values currently for the shape that is on screen, whether or not each box is filled and with which shape, and the rotation
@@ -118,6 +122,7 @@ def check_collision(board, shape, offset):
 def remove_row(board, row):
     """ Remove a row from the board, add a blank row on top. """
     del board[row]
+    #winsound.PlaySound("vqgfh-0xm0f.wav", winsound.SND_ASYNC)
     return [[0 for i in range(COLUMN_COUNT)]] + board
 
 
@@ -151,7 +156,7 @@ class MyGame(arcade.Window):
         super().__init__(width, height, title)
 
         #Set Background Color
-        arcade.set_background_color(arcade.color.DARK_GRAY)
+        arcade.set_background_color(arcade.color.BLACK_LEATHER_JACKET)
 
         self.board = None
         self.frame_count = 0
@@ -160,13 +165,12 @@ class MyGame(arcade.Window):
         self.board_sprite_list = None
         self.score = 0
 
+        self.player_num = 0
+
     def new_stone(self):
-        """
-        Randomly grab a new stone and set the stone location to the top.
-        If we immediately collide, then game-over.
-        """
         self.stone = random.choice(tetris_shapes)
         self.stone_x = int(COLUMN_COUNT / 2 - len(self.stone[0]) / 2)
+        #self.stone_x = random.randint(0, 8)
         self.stone_y = 0
 
         if self.stone[0][0] != 0:
@@ -176,7 +180,6 @@ class MyGame(arcade.Window):
         self.rotation = 1
 
         if check_collision(self.board, self.stone, (self.stone_x, self.stone_y)):
-            #Caclulate Fitness here
             self.restart()
 
 
@@ -209,7 +212,7 @@ class MyGame(arcade.Window):
           Create a new stone
         """
         if not self.game_over and not self.paused:
-            self.stone_y += 1
+            self.stone_y += 1#was 1
             if check_collision(self.board, self.stone, (self.stone_x, self.stone_y)):
                 self.board = join_matrixes(self.board, self.stone, (self.stone_x, self.stone_y))
                 while True:
@@ -248,10 +251,23 @@ class MyGame(arcade.Window):
     def update(self, dt):
         """ Update, drop stone if warrented """
         self.frame_count += 1
-        if self.frame_count % 10 == 0:
+        if self.frame_count > 1:
+            olist = []
+            nlist = []
+            # for x in range(len(pop.get_player(self.player_num).brain.genes)):
+            #     olist.append(pop.get_player(self.player_num).brain.genes[x].weight)
+            # print(olist)
+            # for y in range(244, len(pop.get_player(self.player_num).brain.nodes), 1):
+            #     nlist.append(pop.get_player(self.player_num).brain.nodes[y].input_sum)
+            if self.frame_count % 100 == 0:
+                print(pop.get_player(self.player_num).think(self.output_info()))
+            #     print(nlist)
+                #print(pop.get_player(self.player_num).think(self.output_info()))
+            #print(pop.get_player(self.player_num).brain.nodes[100].output_connections)
+            self.run_ai(pop.get_player(self.player_num).think(self.output_info()))
             self.drop() 
-        score_print = "Score: ", str(self.score)
-        print(score_print, sep=' ', end='', flush=True)
+            if self.frame_count % 13400 == 0:
+                winsound.PlaySound("ym7gy-tdvqo.wav", winsound.SND_ASYNC)
 
     def move(self, delta_x):
         """ Move the stone back and forth based on delta x. """
@@ -265,20 +281,24 @@ class MyGame(arcade.Window):
                 self.stone_x = new_x
 
     def on_key_press(self, key, modifiers):
-        """
-        Handle user key presses
-        User goes left, move -1
-        User goes right, move 1
-        Rotate stone,
-        or drop down
-        """
-        if key == arcade.key.LEFT:
+        pass
+        # if key == arcade.key.LEFT:
+        #     self.move(-1)
+        # elif key == arcade.key.RIGHT:
+        #     self.move(1)
+        # elif key == arcade.key.UP:
+        #     self.rotate_stone()
+        # elif key == arcade.key.DOWN:
+        #     self.rotate_stone_counter_clockwise()
+
+    def run_ai(self, input):
+        if input == 1:
             self.move(-1)
-        elif key == arcade.key.RIGHT:
+        elif input == 2:
             self.move(1)
-        elif key == arcade.key.UP:
+        elif input == 3:
             self.rotate_stone()
-        elif key == arcade.key.DOWN:
+        elif input == 4:
             self.rotate_stone_counter_clockwise()
 
     def draw_grid(self, grid, offset_x, offset_y):
@@ -317,19 +337,40 @@ class MyGame(arcade.Window):
         self.board_sprite_list.draw()
         self.draw_grid(self.stone, self.stone_x, self.stone_y)
 
-    def outputBoard(self):
+    def output_board(self):
         pixels = []
-        for row in range(len(self.board)):
+        for row in range(len(self.board) -1):#leaves out the pre-populated bottom row
             for column in range(len(self.board[0])):
                 pixels.append(self.board[row][column])
         return pixels
+
+    def output_shape_location(self):
+        return [self.stone_x, self.stone_y]
+
+    #The outputs are as follows: Current Shape, Shape Location, Shape Rotation, Grid Data 
+    def output_info(self):
+        outputs = []
+        outputs.append(self.shape)
+        outputs.append(self.rotation)
+        outputs.extend(self.output_shape_location())
+        outputs.extend(self.output_board())
+        return outputs
 
     def restart(self):
         print(Fore.LIGHTRED_EX + "Game Over")
         print(Fore.YELLOW + "Final Score: ", self.score)
         self.get_high_score()
+        self.calculate_fitness()
+        if self.player_num != len(pop.pop) - 1:
+            self.player_num += 1
+        else:
+            pop.selection()
+            self.player_num = 0
+
         print(Fore.GREEN + "Starting New Game")
+        print(self.player_num)
         print()
+
         self.score = 0
         self.board = new_board()
         self.update_board()
@@ -346,13 +387,26 @@ class MyGame(arcade.Window):
             new_data.write(str(self.score))
             new_data.close()
 
+    def calculate_fitness(self):
+        fitness = 0
+        for row in range(len(self.board) -1):#leaves out the pre-populated bottom row
+            total = 0
+            for column in range(len(self.board[0])):
+                if self.board[row][column] != 0:
+                    total += 1
+            if(total > 3):
+                fitness += (total / (COLUMN_COUNT * 2))
+        fitness += self.score
+        pop.get_player(self.player_num).set_fitness(fitness)
 
-my_game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-player = Player()
+
+tetris = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 def main():
     """ Create the game window, setup, run """
-    my_game.setup()
+    winsound.PlaySound("ym7gy-tdvqo.wav", winsound.SND_ASYNC)
+    tetris.setup()
     arcade.run()
+    
 
 if __name__ == "__main__":
     main()
