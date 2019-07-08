@@ -1,9 +1,9 @@
 # Tetris-NeuroEvolution-AI
 Tetris clone with Neuro-Evolution of Augmented Typologies Artificial Intelligence as the player<br>
 <a href="http://arcade.academy/index.html">Built using Python Arcade Module</a><br>
-<a href="http://arcade.academy/examples/tetris.html#tetris">Tetris Code Used</a>
-<a href="https://neat-python.readthedocs.io/en/latest/neat_overview.html">NEAT-Python</a>
-<a href="https://github.com/ikergarcia1996/NeuroEvolution-Flappy-Bird/blob/master/Jupyter%20Notebook/Flappy.ipynb">Flappy Bird NEAT code used as an example of how to set up the training</a>
+<a href="http://arcade.academy/examples/tetris.html#tetris">Tetris Code Used</a><br>
+<a href="https://neat-python.readthedocs.io/en/latest/neat_overview.html">NEAT-Python</a><br>
+<a href="https://github.com/ikergarcia1996/NeuroEvolution-Flappy-Bird/blob/master/Jupyter%20Notebook/Flappy.ipynb">Flappy Bird NEAT code used as an example of how to set up the training</a><br>
 
 Execute Train.py the run.py to see the best AI play the game<br>
 Executing Tetris.py will load up a human playable version at a reasonable speed<br>
