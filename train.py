@@ -219,7 +219,7 @@ def eval_genomes(genomes,config):
         genome.fitness = game.calculate_fitness()
     
 if __name__ == "__main__":
-    config = neat.Config(neat.DefaultGenome,neat.DefaultReproduction,neat.DefaultSpeciesSet,neat.DefaultStagnation,'TetrisNEAT')
+    config = neat.Config(neat.DefaultGenome,neat.DefaultReproduction,neat.DefaultSpeciesSet,neat.DefaultStagnation,'./data/TetrisNEAT')
     p = neat.Population(config)
     p.add_reporter(neat.StdOutReporter(False))
     winner = p.run(eval_genomes,number_generations)
