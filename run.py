@@ -143,8 +143,6 @@ class MyGame(arcade.Window):
         self.board_sprite_list = None
         self.score = 0
 
-        self.player_num = 0
-
     def new_stone(self):
         self.stone = random.choice(tetris_shapes)
         self.stone_x = int(COLUMN_COUNT / 2 - len(self.stone[0]) / 2)
@@ -333,7 +331,6 @@ class MyGame(arcade.Window):
         print(Fore.LIGHTRED_EX + "Game Over")
         print(Fore.YELLOW + "Final Score: ", self.score)
         print(Fore.GREEN + "Starting New Game")
-        print(self.player_num)
         print()
         self.score = 0
         self.board = new_board()

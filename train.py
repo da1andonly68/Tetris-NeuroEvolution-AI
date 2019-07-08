@@ -85,14 +85,6 @@ class Tetris:
         self.score = 0
         self.setup()
         
-    def calculateInput(self):
-        dist_X_to_The_Wall = self.wallx+80
-        dist_Y_to_The_Wall_UP = self.birdY-(0 - self.gap - self.offset+500)
-        dist_Y_to_The_Wall_DOWN = self.birdY-(360 + self.gap - self.offset)
-        dist_Y_TOP = self.birdY
-        dist_Y_BOTTOM = 720-self.birdY
-        res = [dist_X_to_The_Wall,dist_Y_to_The_Wall_UP,dist_Y_to_The_Wall_DOWN,dist_Y_TOP,dist_Y_BOTTOM]
-        return res
     
     def new_stone(self):
         self.stone = random.choice(tetris_shapes)
@@ -199,7 +191,7 @@ import neat
 number_generations = 1000
 def eval_genomes(genomes,config):
     for genome_id, genome in genomes:
-        genome.fitness = 99999
+        genome.fitness = 0
         net = neat.nn.FeedForwardNetwork.create(genome,config)
         game = Tetris()
         while (not game.game_over and not game.score > 10):
@@ -213,7 +205,7 @@ def eval_genomes(genomes,config):
                     max = output[d]
                     max_index = d
             game.play_ai(max_index)
-        if game.calculate_fitness() >= 10:
+        if game.calculate_fitness() >= 13:
             with open("./data/legend.pickle", "wb") as pickle_out:
                 pickle.dump(net, pickle_out) 
         genome.fitness = game.calculate_fitness()
