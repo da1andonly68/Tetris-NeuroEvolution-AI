@@ -10,8 +10,8 @@ Execute Train.py the run.py to see the best AI play the game<br>
 Executing Tetris.py will load up a human playable version at a reasonable speed<br>
 Use the left and right arrow keys to move horizontally and up and down to rotate<br>
 <br>
-Training and selection is done in a simulation of tetris that updates much faster than the game loop allows to<br>
-The python arcade module does not seem to run along side the neat module, so instead, a pickled<br>
+Training and selection is done in a simulation of tetris that updates much faster than the game loop allows to
+The python arcade module does not seem to run along side the neat module, so instead, a pickled
 player that meets the specified fitness requirement is loaded to play in the run file<br>
 <br>
 The AI don't do too great a job at playing tetris, even with the selection process<br>
