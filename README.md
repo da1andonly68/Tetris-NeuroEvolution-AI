@@ -6,6 +6,7 @@ Tetris clone with Neuro-Evolution of Augmented Typologies Artificial Intelligenc
 <a href="https://github.com/ikergarcia1996/NeuroEvolution-Flappy-Bird/blob/master/Jupyter%20Notebook/Flappy.ipynb">Flappy Bird NEAT code used as an example of how to set up the training</a><br>
 
 Execute Train.py the run.py to see the best AI play the game<br>
+<br>
 Executing Tetris.py will load up a human playable version at a reasonable speed<br>
 Use the left and right arrow keys to move horizontally and up and down to rotate<br>
 <br>
