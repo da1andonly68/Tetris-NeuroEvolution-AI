@@ -16,7 +16,7 @@ player that meets the specified fitness requirement is loaded to play in the run
 <br>
 The AI don't do too great a job at playing tetris, even with the selection process<br>
 The highest score after about 3 million simulations was 2 and I only saw the reloaded legends do it once per game at most<br>
-The fitness calculation takes into account how much a row was filled if there is more<br>
+The fitness calculation takes into account how much a row was filled if there is more
 than one peice in it, which leads to AI that just put two peices per row being selected for<br>
 Results weren't better when the fitness function accounted only for row clears<br>
 Basically all the AI failed under those conditions<br>
