@@ -38,8 +38,8 @@ colors = [
 
 # Define the shapes of the single parts
 tetris_shapes = [
-    [[1, 1, 1],
-     [0, 1, 0]],
+    [[0, 1, 0],
+     [1, 1, 1]],
 
     [[0, 2, 2],
      [2, 2, 0]],
@@ -61,19 +61,14 @@ tetris_shapes = [
 
 
 def create_textures():
-    """ Create a list of images for sprites based on the global colors. """
     texture_list = []
     for color in colors:
         image = PIL.Image.new('RGB', (WIDTH, HEIGHT), color)
         texture_list.append(arcade.Texture(str(color), image=image))
     return texture_list
-
-
 texture_list = create_textures()
 
-
 def rotate_clockwise(shape):
-    """ Rotates a matrix clockwise """
     return np.rot90(shape)
 
 def rotate_counter_clockwise(shape):
@@ -82,10 +77,6 @@ def rotate_counter_clockwise(shape):
     return np.rot90(shape)
 
 def check_collision(board, shape, offset):
-    """
-    See if the matrix stored in the shape will intersect anything
-    on the board based on the offset. Offset is an (x, y) coordinate.
-    """
     off_x, off_y = offset
     for cy, row in enumerate(shape):
         for cx, cell in enumerate(row):
@@ -98,14 +89,11 @@ def check_collision(board, shape, offset):
 
 
 def remove_row(board, row):
-    """ Remove a row from the board, add a blank row on top. """
     del board[row]
-    #winsound.PlaySound("vqgfh-0xm0f.wav", winsound.SND_ASYNC)
     return [[0 for i in range(COLUMN_COUNT)]] + board
 
 
 def join_matrixes(matrix_1, matrix_2, matrix_2_offset):
-    """ Copy matrix 2 onto matrix 1 based on the passed in x, y offset coordinate """
     offset_x, offset_y = matrix_2_offset
     for cy, row in enumerate(matrix_2):
         for cx, val in enumerate(row):
@@ -153,6 +141,7 @@ class MyGame(arcade.Window):
             self.shape = self.stone[0][0]
         else:
             self.shape = self.stone[1][1]
+        self.shape /= 7
         self.rotation = 1
 
         if check_collision(self.board, self.stone, (self.stone_x, self.stone_y)):
@@ -189,42 +178,39 @@ class MyGame(arcade.Window):
           Update sprite list with stones
           Create a new stone
         """
-        if not self.game_over and not self.paused:
-            self.stone_y += 1#was 1
-            if check_collision(self.board, self.stone, (self.stone_x, self.stone_y)):
-                self.board = join_matrixes(self.board, self.stone, (self.stone_x, self.stone_y))
-                while True:
-                    for i, row in enumerate(self.board[:-1]):
-                        if 0 not in row:
-                            self.board = remove_row(self.board, i)
-                            self.score += 1
-                            break
-                    else:
+        self.stone_y += 1#was 1
+        if check_collision(self.board, self.stone, (self.stone_x, self.stone_y)):
+            self.board = join_matrixes(self.board, self.stone, (self.stone_x, self.stone_y))
+            while True:
+                for i, row in enumerate(self.board[:-1]):
+                    if 0 not in row:
+                        self.board = remove_row(self.board, i)
+                        self.score += 1
                         break
-                self.update_board()
-                self.new_stone()
+                else:
+                    break
+            self.update_board()
+            self.new_stone()
 
     def rotate_stone(self):
         """ Rotate the stone, check collision. """
-        if not self.game_over and not self.paused:
-            new_stone = rotate_clockwise(self.stone)
-            if not check_collision(self.board, new_stone, (self.stone_x, self.stone_y)):
-                self.stone = new_stone
-                if self.rotation == 4:
-                    self.rotation = 1
-                else:
-                    self.rotation += 1
+        new_stone = rotate_clockwise(self.stone)
+        if not check_collision(self.board, new_stone, (self.stone_x, self.stone_y)):
+            self.stone = new_stone
+            if self.rotation == 4:
+                self.rotation = 1
+            else:
+                self.rotation += 1
 
     def rotate_stone_counter_clockwise(self):
         """ Rotate the stone, check collision. """
-        if not self.game_over and not self.paused:
-            new_stone = rotate_counter_clockwise(self.stone)
-            if not check_collision(self.board, new_stone, (self.stone_x, self.stone_y)):
-                self.stone = new_stone
-                if self.rotation == 1:
-                    self.rotation = 4
-                else:
-                    self.rotation -= 1
+        new_stone = rotate_counter_clockwise(self.stone)
+        if not check_collision(self.board, new_stone, (self.stone_x, self.stone_y)):
+            self.stone = new_stone
+            if self.rotation == 1:
+                self.rotation = 4
+            else:
+                self.rotation -= 1
                 
     def update(self, dt):
         """ Update, drop stone if warrented """
@@ -242,14 +228,13 @@ class MyGame(arcade.Window):
 
     def move(self, delta_x):
         """ Move the stone back and forth based on delta x. """
-        if not self.game_over and not self.paused:
-            new_x = self.stone_x + delta_x
-            if new_x < 0:
-                new_x = 0
-            if new_x > COLUMN_COUNT - len(self.stone[0]):
-                new_x = COLUMN_COUNT - len(self.stone[0])
-            if not check_collision(self.board, self.stone, (new_x, self.stone_y)):
-                self.stone_x = new_x
+        new_x = self.stone_x + delta_x
+        if new_x < 0:
+            new_x = 0
+        if new_x > COLUMN_COUNT - len(self.stone[0]):
+            new_x = COLUMN_COUNT - len(self.stone[0])
+        if not check_collision(self.board, self.stone, (new_x, self.stone_y)):
+            self.stone_x = new_x
 
     def on_key_press(self, key, modifiers):
         pass
@@ -312,11 +297,15 @@ class MyGame(arcade.Window):
         pixels = []
         for row in range(len(self.board) -1):#leaves out the pre-populated bottom row
             for column in range(len(self.board[0])):
-                pixels.append(self.board[row][column])
+                if self.board[row][column] != 0:
+                    value = 1
+                else:
+                    value = 0
+                pixels.append(value)
         return pixels
 
     def output_shape_location(self):
-        return [self.stone_x, self.stone_y]
+        return [self.stone_x / 8, self.stone_y / 22]
 
     #The outputs are as follows: Current Shape, Shape Location, Shape Rotation, Grid Data 
     def output_info(self):
@@ -328,10 +317,8 @@ class MyGame(arcade.Window):
         return outputs
 
     def restart(self):
-        print(Fore.LIGHTRED_EX + "Game Over")
-        print(Fore.YELLOW + "Final Score: ", self.score)
-        print(Fore.GREEN + "Starting New Game")
-        print()
+        if self.score > 0:
+            print(Fore.YELLOW + "Final Score: ", self.score)
         self.score = 0
         self.board = new_board()
         self.update_board()
