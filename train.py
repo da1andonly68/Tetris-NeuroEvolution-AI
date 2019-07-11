@@ -6,8 +6,8 @@ import pickle
 import neat
 
 #NEAT Setup
-number_generations = 20
-fitness_for_saving = 13
+number_generations = 10000
+fitness_for_saving = 20
 
 #Game Setup 
 #Rows and Columns of the grid
@@ -102,7 +102,6 @@ class Tetris:
             self.shape = self.stone[0][0]
         else:
             self.shape = self.stone[1][1]
-        self.shape /= 7
 
         self.rotation = 1
 
@@ -168,16 +167,33 @@ class Tetris:
                 pixels.append(value)
         return pixels
 
+    def output_shape(self):
+        shape_list = [0,0,0,0,0,0,0]
+        shape_list[self.shape - 1] = 1
+        return shape_list
+
+    def output_rotation(self):
+        rotation_list = [0,0,0,0]
+        rotation_list[self.rotation - 1] = 1
+        return rotation_list
+
     def output_shape_location(self):
         #Scales the number from a small fraction to 1
-        return [self.stone_x / 8, self.stone_y / 22]
+        x_locations = [0,0,0,0,0,0,0,0,0]
+        y_locations = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        x_locations[self.stone_x - 1] = 1
+        y_locations[self.stone_y - 1] = 1
+        locations = []
+        locations.extend(x_locations)
+        locations.extend(y_locations)
+        return locations
 
     #The outputs are as follows: Current Shape, Shape Location, Shape Rotation, Grid Data 
     #Inputs to the AI
     def output_info(self):
         outputs = []
-        outputs.append(self.shape)
-        outputs.append(self.rotation)
+        outputs.extend(self.output_shape())
+        outputs.extend(self.output_rotation())
         outputs.extend(self.output_shape_location())
         outputs.extend(self.output_board())
         return outputs
